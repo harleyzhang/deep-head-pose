@@ -39,6 +39,8 @@ def parse_args():
           default='', type=str)
 
     args = parser.parse_args()
+    print('-----------------------------------')
+    print(args)
     return args
 
 def get_ignored_params(model):
@@ -96,7 +98,7 @@ if __name__ == '__main__':
         saved_state_dict = torch.load(args.snapshot)
         model.load_state_dict(saved_state_dict)
 
-    print 'Loading data.'
+    print('Loading data.')
 
     transformations = transforms.Compose([transforms.Scale(240),
     transforms.RandomCrop(224), transforms.ToTensor(),
@@ -119,13 +121,13 @@ if __name__ == '__main__':
     elif args.dataset == 'AFW':
         pose_dataset = datasets.AFW(args.data_dir, args.filename_list, transformations)
     else:
-        print 'Error: not a valid dataset name'
+        print('Error: not a valid dataset name')
         sys.exit()
 
     train_loader = torch.utils.data.DataLoader(dataset=pose_dataset,
                                                batch_size=batch_size,
                                                shuffle=True,
-                                               num_workers=2)
+                                               num_workers=4)
 
     model.cuda(gpu)
     criterion = nn.CrossEntropyLoss().cuda(gpu)
@@ -134,7 +136,7 @@ if __name__ == '__main__':
     alpha = args.alpha
 
     softmax = nn.Softmax().cuda(gpu)
-    idx_tensor = [idx for idx in xrange(66)]
+    idx_tensor = [idx for idx in range(66)]
     idx_tensor = Variable(torch.FloatTensor(idx_tensor)).cuda(gpu)
 
     optimizer = torch.optim.Adam([{'params': get_ignored_params(model), 'lr': 0},
@@ -142,8 +144,13 @@ if __name__ == '__main__':
                                   {'params': get_fc_params(model), 'lr': args.lr * 5}],
                                    lr = args.lr)
 
-    print 'Ready to train network.'
+    print('Ready to train network.')
     for epoch in range(num_epochs):
+        # change learning rate every 10th epochs
+        if (epoch + 1) % 10 == 0:
+          for param_group in optimizer.param_groups:
+             param_group['lr'] *= 0.1
+
         for i, (images, labels, cont_labels, name) in enumerate(train_loader):
             images = Variable(images).cuda(gpu)
 
@@ -160,6 +167,8 @@ if __name__ == '__main__':
             # Forward pass
             yaw, pitch, roll = model(images)
 
+            #import pdb; pdb.set_trace()
+           
             # Cross entropy loss
             loss_yaw = criterion(yaw, label_yaw)
             loss_pitch = criterion(pitch, label_pitch)
@@ -190,11 +199,12 @@ if __name__ == '__main__':
             optimizer.step()
 
             if (i+1) % 100 == 0:
-                print ('Epoch [%d/%d], Iter [%d/%d] Losses: Yaw %.4f, Pitch %.4f, Roll %.4f'
-                       %(epoch+1, num_epochs, i+1, len(pose_dataset)//batch_size, loss_yaw.data[0], loss_pitch.data[0], loss_roll.data[0]))
+                print('Epoch [%d/%d], Iter [%d/%d] Losses: Yaw %.4f, Pitch %.4f, Roll %.4f'
+                   %(epoch+1, num_epochs, i+1, len(pose_dataset)//batch_size, \
+                   loss_yaw.data, loss_pitch.data, loss_roll.data))
 
         # Save models at numbered epochs.
         if epoch % 1 == 0 and epoch < num_epochs:
-            print 'Taking snapshot...'
+            print('Taking snapshot...')
             torch.save(model.state_dict(),
             'output/snapshots/' + args.output_string + '_epoch_'+ str(epoch+1) + '.pkl')

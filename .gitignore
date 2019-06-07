@@ -4,3 +4,7 @@ data/*
 output/*
 *.jpg
 *.png
+__pycache__
+
+00ReadMe.txt
+results/*

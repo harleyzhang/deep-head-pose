@@ -64,6 +64,7 @@ class Synhead(Dataset):
 
         # Bin values
         bins = np.array(range(-99, 102, 3))
+        yaw, pitch, roll = np.clip([yaw, pitch, roll], -99, 98)
         binned_pose = np.digitize([yaw, pitch, roll], bins) - 1
 
         labels = torch.LongTensor(binned_pose)
@@ -133,6 +134,7 @@ class Pose_300W_LP(Dataset):
 
         # Bin values
         bins = np.array(range(-99, 102, 3))
+        yaw, pitch, roll = np.clip([yaw, pitch, roll], -99, 98)
         binned_pose = np.digitize([yaw, pitch, roll], bins) - 1
 
         # Get target tensors
@@ -208,6 +210,7 @@ class Pose_300W_LP_random_ds(Dataset):
 
         # Bin values
         bins = np.array(range(-99, 102, 3))
+        yaw, pitch, roll = np.clip([yaw, pitch, roll], -99, 98)
         binned_pose = np.digitize([yaw, pitch, roll], bins) - 1
 
         # Get target tensors
@@ -265,6 +268,7 @@ class AFLW2000(Dataset):
         roll = pose[2] * 180 / np.pi
         # Bin values
         bins = np.array(range(-99, 102, 3))
+        yaw, pitch, roll = np.clip([yaw, pitch, roll], -99, 98)
         labels = torch.LongTensor(np.digitize([yaw, pitch, roll], bins) - 1)
         cont_labels = torch.FloatTensor([yaw, pitch, roll])
 
@@ -324,6 +328,7 @@ class AFLW2000_ds(Dataset):
         roll = pose[2] * 180 / np.pi
         # Bin values
         bins = np.array(range(-99, 102, 3))
+        yaw, pitch, roll = np.clip([yaw, pitch, roll], -99, 98)
         labels = torch.LongTensor(np.digitize([yaw, pitch, roll], bins) - 1)
         cont_labels = torch.FloatTensor([yaw, pitch, roll])
 
@@ -377,6 +382,7 @@ class AFLW_aug(Dataset):
 
         # Bin values
         bins = np.array(range(-99, 102, 3))
+        yaw, pitch, roll = np.clip([yaw, pitch, roll], -99, 98)
         labels = torch.LongTensor(np.digitize([yaw, pitch, roll], bins) - 1)
         cont_labels = torch.FloatTensor([yaw, pitch, roll])
 
@@ -421,6 +427,7 @@ class AFLW(Dataset):
         roll *= -1
         # Bin values
         bins = np.array(range(-99, 102, 3))
+        yaw, pitch, roll = np.clip([yaw, pitch, roll], -99, 98)
         labels = torch.LongTensor(np.digitize([yaw, pitch, roll], bins) - 1)
         cont_labels = torch.FloatTensor([yaw, pitch, roll])
 
@@ -476,6 +483,7 @@ class AFW(Dataset):
 
         # Bin values
         bins = np.array(range(-99, 102, 3))
+        yaw, pitch, roll = np.clip([yaw, pitch, roll], -99, 98)
         labels = torch.LongTensor(np.digitize([yaw, pitch, roll], bins) - 1)
         cont_labels = torch.FloatTensor([yaw, pitch, roll])
 
@@ -553,6 +561,7 @@ class BIWI(Dataset):
 
         # Bin values
         bins = np.array(range(-99, 102, 3))
+        yaw, pitch, roll = np.clip([yaw, pitch, roll], -99, 98)
         binned_pose = np.digitize([yaw, pitch, roll], bins) - 1
 
         labels = torch.LongTensor(binned_pose)

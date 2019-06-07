@@ -1,4 +1,5 @@
 import sys, os, argparse
+import time
 
 import numpy as np
 import cv2
@@ -102,6 +103,8 @@ if __name__ == '__main__':
 
     frame_num = 1
 
+    start_time = time.time()
+
     while frame_num <= args.n_frames:
         print frame_num
 
@@ -112,7 +115,10 @@ if __name__ == '__main__':
         cv2_frame = cv2.cvtColor(frame,cv2.COLOR_BGR2RGB)
 
         # Dlib detect
+        t1 = time.time()
         dets = cnn_face_detector(cv2_frame, 1)
+        t2 = time.time()
+        print "Face detection elapsed: " + str(t2-t1)
 
         for idx, det in enumerate(dets):
             # Get x_min, y_min, x_max, y_max, conf
@@ -158,7 +164,13 @@ if __name__ == '__main__':
                 # Plot expanded bounding box
                 # cv2.rectangle(frame, (x_min, y_min), (x_max, y_max), (0,255,0), 1)
 
-        out.write(frame)
+        t3 = time.time()
+        print "Headpose elapsed: " + str(t3-t2)
+
+        #out.write(frame)
+        #show fps
+        if frame_num % 100 == 0:
+           print "FPS: " + str(frame_num / (time.time()-start_time))
         frame_num += 1
 
     out.release()
